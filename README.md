@@ -1,245 +1,174 @@
-# PADDY YIELD PREDICTION
+# 🌾 Paddy Yield Prediction System
 
-
-# Rice Yield Prediction using Optimized Random Forest
-
-A Machine Learning application for predicting rice yield based on agricultural, environmental, and cultivation factors. This project compares multiple regression algorithms and deploys the best-performing model using Streamlit for interactive prediction.
+A machine learning application that predicts rice (paddy) yield from agricultural cultivation data — land area, seed usage, fertilization, and crop protection inputs — and serves the prediction through an interactive Streamlit web app.
 
 ---
 
-## Project Overview
+## 🎥 Live Demo
 
-Accurate rice yield prediction is essential for agricultural planning, fertilizer management, and improving farming productivity. This project develops a machine learning model capable of estimating rice yield from cultivation parameters.
-
-Three regression algorithms were evaluated:
-
-- Linear Regression (Baseline)
-- K-Nearest Neighbors (KNN) Regressor
-- Optimized Random Forest Regressor
-
-Among them, the Optimized Random Forest achieved the best predictive performance and was selected for deployment.
+- **Demo Video:** [Watch on Google Drive](https://drive.google.com/file/d/1rsxZ-KoJeUb3_j_LDoSpgeTKJPQCuy7o/view?usp=drivesdk)
+- **Live Application:** [paddy-yield-prediction.streamlit.app](https://2aolml-l49mtt5tx7f4sj8heeu9kx.streamlit.app)
 
 ---
 
-## Objectives
+## 🎯 Project Purpose
 
-- Predict rice yield from agricultural input variables.
-- Compare multiple regression algorithms.
-- Optimize model performance through hyperparameter tuning.
-- Deploy the best model as an interactive Streamlit application.
+Rice yield is influenced by many interacting cultivation factors — land preparation, seeding rate, fertilizer dosage, and pest/weed control — which makes manual estimation difficult for farmers and agricultural planners. This project builds a regression model that learns from historical paddy cultivation records to estimate total yield (in Kg) from a set of measurable farming inputs, and packages it into a simple web form so that a user can enter their own field data and immediately get a yield estimate along with basic productivity feedback.
 
----
-
-## Dataset
-
-**Source**
-
-UCI Machine Learning Repository – Paddy Crop Dataset
-
-After preprocessing:
-
-- Total samples: **2,338**
-- Total original features: **45**
-- Missing values: **0**
-- Duplicate records removed
+The intended users are farmers, agricultural students, or planners who want a quick, data-driven estimate of expected rice yield based on their cultivation practices.
 
 ---
 
-## Feature Selection
+## ✨ Features
 
-Feature importance was calculated using a baseline Random Forest model.
-
-The final model uses the most important agricultural features:
-
-- Hectares
-- Variety
-- Soil Types
-- Seedrate (Kg)
-- Urea_40Days
-- Potassh_50Days
-- 30DRain (mm)
-- Relative Humidity_D1_D30
-
-These features were selected because they contributed most significantly to rice yield prediction while keeping the model efficient.
+- 📋 **Categorized input form** — cultivation parameters are grouped into logical sections: main land area, nursery/seedbed, main field preparation, fertilization & nutrition, and crop protection
+- 🌳 **Yield prediction** powered by an Optimized Random Forest Regressor trained on historical paddy cultivation data
+- 📊 **Productivity ratio calculation** — converts the total predicted yield into Kg per hectare
+- 🚦 **Productivity classification** — automatically labels the result as *Rendah* (Low), *Sedang* (Medium), or *Tinggi* (High) based on the yield-per-hectare ratio
+- 💡 **Rule-based cultivation recommendations** — generates guidance on seed rate, soil fertility, macro-fertilizer strategy, micronutrients, and weed/pest protection based on the values entered
+- 🎨 **Custom-styled interface** with light and dark mode support
+- 🖼️ Branded header image (crop logo)
 
 ---
 
-## Machine Learning Pipeline
+## ⚙️ How It Works
 
-1. Data Cleaning
-2. Duplicate Removal
-3. Feature Selection
-4. One-Hot Encoding
-5. Robust Scaling
-6. Train-Test Split (80:20)
-7. Hyperparameter Tuning
-8. 5-Fold Cross Validation
-9. Model Evaluation
-10. Streamlit Deployment
+1. The user opens the Streamlit app and is shown a form of numeric input fields grouped into five categorized cards (land area, nursery, main field preparation, fertilization, crop protection).
+2. The user enters values reflecting their actual field conditions (each field has a sensible default value pre-filled).
+3. On clicking **"Hitung Prediksi Hasil Panen"** (Calculate Yield Prediction), the app assembles the inputs into a single-row DataFrame and reindexes it to match the exact feature order the model was trained on (`feature_columns.pkl`).
+4. The input row is scaled using the saved `StandardScaler` (`robust_standard_scaler.pkl`).
+5. The scaled input is passed to the trained Random Forest model (`best_random_forest_model.pkl`), which returns a predicted total yield in Kg.
+6. The app derives the yield-per-hectare ratio and classifies it into a productivity tier (Low / Medium / High).
+7. The prediction, productivity ratio, and tier are displayed in a result card, followed by a set of rule-based cultivation recommendations generated from the input values.
 
 ---
 
-## Models Compared
+## 🧰 Tech Stack
 
-Linear Regression: Baseline model 
-KNN Regressor: Distance-based regression 
-Random Forest: Ensemble learning model 
+### Programming Language
+- Python
 
-### Hyperparameter Tuning
+### Frameworks / Libraries
+- [Streamlit](https://streamlit.io/) — web app framework / UI
+- pandas — data handling
+- NumPy
+- scikit-learn — model training, scaling, evaluation
+- joblib — model/scaler/column serialization
+- Pillow (PIL) — logo image loading
 
-### Random Forest
+### Tools
+- Jupyter Notebook — data exploration, model training and evaluation (`main.ipynb`)
+- Git / GitHub — version control
 
-- n_estimators = 50, 100, 150
-- max_depth = None, 10, 20
+### AI / Machine Learning
+- **RandomForestRegressor** (scikit-learn) — final deployed model, tuned via `GridSearchCV`
+- **KNeighborsRegressor** and **LinearRegression** — baseline models compared against Random Forest
+- **GridSearchCV** + **KFold** (5-fold) cross-validation — hyperparameter tuning
+- **StandardScaler** — feature scaling
 
-Best Parameters:
+---
+
+## 📁 Project Structure
 
 ```text
-n_estimators = 150
-max_depth = None
+PaddyYield - Machine Learning/
+├── app.py                                                              # Streamlit web application (main entry point)
+├── main.ipynb                                                          # Data cleaning, feature selection, model training & evaluation
+├── train_model.py                                                      # Minimal example script (not the production training pipeline)
+├── paddydataset.csv                                                    # Raw dataset used for training
+├── best_random_forest_model.pkl                                        # Trained Random Forest model (used by app.py)
+├── robust_standard_scaler.pkl                                          # Fitted StandardScaler used to scale user input
+├── feature_columns.pkl                                                 # Ordered list of feature columns expected by the model
+├── requirements.txt                                                    # Python dependencies
+├── logo_padi.jpg                                                       # Header/logo image used in the app
+├── performance_metrics_comparison.png                                  # Model performance comparison chart
+├── actual_vs_predicted_3_models_grid.png                               # Actual vs. predicted yield plots for all 3 models
+├── feature_importance_all_45.png                                       # Feature importance chart (all 45 original features)
+├── feature_importance_top12.png                                       # Feature importance chart (top 12 selected features)
+├── Prediksi Hasil Panen Padi Menggunakan Pendekatan Machine Learning.docx  # Project report document
+└── README.md
 ```
 
-### KNN
-
-- n_neighbors = 3, 5, 7
-- weights = uniform, distance
-
-Best Parameters:
-
-```text
-n_neighbors = 7
-weights = uniform
-```
+**Notable files:**
+- `app.py` — the Streamlit application users interact with.
+- `main.ipynb` — the actual ML pipeline: data cleaning, feature selection, encoding, scaling, hyperparameter tuning, model comparison, and export of the `.pkl` artifacts used by `app.py`.
+- `train_model.py` — a small standalone example script using a dummy dataset; it is **not** the pipeline used to produce the deployed model.
 
 ---
 
-## Model Performance
+## 🖱️ How to Use
 
-| Model | MAE (kg) | RMSE (kg) | P90 Error (kg) | R² |
-|--------|----------:|----------:|---------------:|----:|
-| Optimized Random Forest | **657.62** | **912.78** | **1426.74** | **0.9903** |
-| Optimized KNN | 682.38 | 937.67 | 1458.57 | 0.9897 |
-| Linear Regression | 762.88 | 1021.45 | 1584.16 | 0.9878 |
-
----
-
-## Overfitting Check
-
-The gap between Train R² and Test R² was analyzed to verify the model's generalization capability.
-
-| Model | Train R² | Test R² | Gap |
-|--------|----------:|---------:|----:|
-| Random Forest | 0.9922 | 0.9903 | 0.0019 |
-| KNN | 0.9916 | 0.9897 | 0.0019 |
-| Linear Regression | 0.9893 | 0.9878 | 0.0015 |
-
-All models achieved gaps below **0.01**, indicating no significant overfitting.
+1. Open the [live application](https://2aolml-l49mtt5tx7f4sj8heeu9kx.streamlit.app) (or run it locally — see below).
+2. Fill in the numeric fields in each section:
+   - **Luas Lahan Utama** — main field area (hectares) and seed quantity (kg)
+   - **Area Pembibitan Awal** — nursery area and nursery land preparation
+   - **Pengolahan Lahan Utama** — main field preparation and straw/residue management
+   - **Pemupukan & Nutrisi Tanaman** — DAP, Urea, Potash, and micronutrient dosages
+   - **Perlindungan Tanaman** — herbicide and pesticide amounts
+3. Use a period (`.`) as the decimal separator (e.g. `62.28`).
+4. Click **"Hitung Prediksi Hasil Panen"**.
+5. Review the estimated total yield, the productivity ratio (Kg/hectare), the productivity tier, and the generated cultivation recommendations.
 
 ---
 
-## Streamlit Application
+## 🚀 Installation & Setup
 
-The deployed application allows users to:
+### Prerequisites
+- Python 3.10+
+- pip
 
-- Input agricultural parameters
-- Predict total rice yield
-- View productivity (ton/ha)
-- Read prediction interpretation
-- Obtain recommendations based on prediction results
+### Steps
 
----
-
-## Project Structure
-
-```
-Rice-Yield-Prediction/
-│
-├── app.py
-├── random_forest_model.pkl
-├── scaler.pkl
-├── model_columns.pkl
-├── requirements.txt
-├── README.md
-└── images/
-```
-
----
-
-## Installation
-
-Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/nathanyaxavier/2_AOL_ML.git
+cd "PaddyYield - Machine Learning"
 ```
 
-Move into the project directory
-
-```bash
-cd Rice-Yield-Prediction
-```
-
-Install dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the application
+> **Note:** `requirements.txt` currently lists `streamlit`, `numpy`, and `scikit-learn`. `app.py` also imports `pandas`, `joblib`, and `Pillow`, so make sure these are installed as well (e.g. `pip install pandas joblib pillow`) if they are not already present in your environment.
+
+Run the application locally:
 
 ```bash
 streamlit run app.py
 ```
 
----
+The app will open in your browser, typically at `http://localhost:8501`.
 
-## Requirements
-
-- Python 3.11+
-- Streamlit
-- Pandas
-- NumPy
-- Scikit-learn
-- Joblib
-
-Install all packages using
-
-```bash
-pip install -r requirements.txt
-```
+No environment variables or API keys are required to run this project.
 
 ---
 
-## User Evaluation
+## ☁️ Deployment
 
-The application was evaluated by five independent users.
+The application is deployed on **Streamlit Community Cloud** and is publicly accessible at:
 
-### Average Ratings
+🔗 [https://2aolml-l49mtt5tx7f4sj8heeu9kx.streamlit.app](https://2aolml-l49mtt5tx7f4sj8heeu9kx.streamlit.app)
 
-| Evaluation Aspect | Score |
-|-------------------|------:|
-| Ease of Use | 4.8 / 5 |
-| Interface Clarity | 4.6 / 5 |
-| Relevant Prediction Factors | 4.6 / 5 |
-| Prediction Clarity | 4.2 / 5 |
-| Supports Farming Planning | 4.4 / 5 |
-| Long-term Usefulness | 4.6 / 5 |
+Streamlit Community Cloud builds the app directly from this repository's `app.py` entry point and installs the dependencies listed in `requirements.txt`. The serialized model artifacts (`best_random_forest_model.pkl`, `robust_standard_scaler.pkl`, `feature_columns.pkl`) are loaded directly from the repository at runtime via `joblib`.
 
-Overall feedback indicated that the application is easy to use, provides relevant prediction factors, and has potential to support rice cultivation planning.
+`[Add information here]` — no additional deployment configuration files (e.g. `Dockerfile`, `Procfile`, or Streamlit `secrets.toml`) were found in the source code, so any further platform-specific settings used for the live deployment are not determinable from the repository alone.
 
 ---
 
-## Technologies Used
+## 👥 Team Members
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Streamlit
-- Joblib
+| Name | NIM |
+|------|-----|
+| Angelina Jolie Candaya | 2802541644 |
+| Maureen Calista Surjo | 2802536392 |
+| Nathanya Xavier Napitupulu | 2802545850 |
 
 ---
 
-## License
+## 📄 License
 
 This project was developed for academic purposes.
+
